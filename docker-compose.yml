@@ -1,0 +1,16 @@
+services:
+  web:
+      image: nginx:alpine
+      ports:
+        -"8080:80"
+      depends_on:
+        - postgres
+      networks:
+        - my-app-network
+  postgres:
+      image: postgres:16
+      enviroement:
+        - POSTGRES_PASSWORD=password
+       
+  networks:
+    my-app-network:   
