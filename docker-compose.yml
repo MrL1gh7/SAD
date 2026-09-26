@@ -1,16 +1,48 @@
 services:
-  web:
-      image: nginx:alpine
-      ports:
-        -"8080:80"
-      depends_on:
-        - postgres
-      networks:
-        - my-app-network
-  postgres:
-      image: postgres:16
-      enviroement:
-        - POSTGRES_PASSWORD=password
-       
-  networks:
-    my-app-network:   
+  db:
+    image: postgres:16
+
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: changeme
+      POSTGRES_DB: visits_db
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app -d visits_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+    networks:
+      - app-network
+
+
+  app:
+    build:
+      context: .
+      dockerfile: dockerfile
+
+    env_file:
+      - .env
+
+    ports:
+      - "8001:8000"
+
+    depends_on:
+      db:
+        condition: service_healthy
+
+    networks:
+      - app-network
+
+
+networks:
+  app-network:
+    driver: bridge
+
+
+volumes:
+  postgres-data:

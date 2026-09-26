@@ -1,9 +1,20 @@
-from python:3.11-slim
+FROM python:3.11-slim AS builder
 
-workdir /app
+WORKDIR /app
 
-copy . /app
+COPY requirements.txt .
 
-run pip install -r requirements.txt
+RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
 
-cmd ["python", "main.py"]
+
+FROM python:3.11-slim
+
+WORKDIR /app
+
+COPY --from=builder /install /usr/local
+
+COPY . .
+
+EXPOSE 8000
+
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "app:app"]
