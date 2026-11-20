@@ -123,7 +123,7 @@ class ParkingProcess:
             session.pay(0, now, extra=extra)
         amount = max(0, self.calculate_payment(session) - session.cost)
         if not success:
-            self.gateway.fail_next = True  # Учебная заглушка без настоящих списаний.
+            self.gateway.fail_next = True  
         if not self.gateway.charge(session.id, amount):
             raise InvariantViolation("Платёж не прошёл")
         session.pay(amount, now, extra)
@@ -136,7 +136,7 @@ class ParkingProcess:
         if session.state == "Оплачена" and now > session.exit_deadline:
             raise InvariantViolation("15 минут на выезд уже прошли; требуется доплата")
         if "leave" not in session.allowed_events:
-            session.leave(now)  # правильный 409
+            session.leave(now)  
         session.leave(now)
         self.spots[session.spot_id].release()
         session.record("Открыть шлагбаум на выезде", now, "Место освобождено")
@@ -161,5 +161,5 @@ class ParkingProcess:
         return {"now": now.isoformat(), "checked": len(self.sessions)}
 
 
-# Имя прикладного сервиса из предыдущей лабораторной.
+
 ParkingService = ParkingProcess
