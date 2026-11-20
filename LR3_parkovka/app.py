@@ -1,4 +1,3 @@
-"""Простой Flask-адаптер для ЛР №3. Вся логика хранится в domain.py и service.py."""
 import logging
 import os
 from datetime import datetime
@@ -47,7 +46,7 @@ def create_session():
     data = body()
     number = data.get("car_number", "")
     if not isinstance(number, str):
-        raise InvalidValue("Номер должен быть строкой")
+        raise InvalidValue("Номер должен быть текстом")
     # Не распознан камерой: оператор вводит номер через этот же маршрут.
     result = service.receive_number(number)
     return jsonify(result.as_dict()), 201
@@ -73,7 +72,7 @@ def pay(session_id):
     data = body()
     success = data.get("success", True)
     if type(success) is not bool:
-        raise InvalidValue("success должен быть true или false")
+        raise InvalidValue("В success должно быть true или false")
     return jsonify(service.pay(session_id, success).as_dict())
 
 
@@ -88,7 +87,7 @@ def tick():
     try:
         requested = datetime.fromisoformat(data["now"].replace("Z", "+00:00")) if "now" in data else None
     except (ValueError, AttributeError, TypeError):
-        raise InvalidValue("Нужно время в формате ISO 8601")
+        raise InvalidValue("Нужно время в формате: 14:30:05")
     return jsonify(service.tick(requested))
 
 
